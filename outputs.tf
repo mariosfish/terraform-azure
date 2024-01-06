@@ -1,3 +1,8 @@
+output "command-for-connect" {
+  value       = "ssh ${azurerm_linux_virtual_machine.mtc-vm.admin_username}@${azurerm_linux_virtual_machine.mtc-vm.public_ip_address}"
+  description = "Login to the vm."
+}
+
 output "vm-public_ip_addr" {
   value       = azurerm_linux_virtual_machine.mtc-vm.public_ip_address
   description = "The public ip of the vm."
