@@ -105,7 +105,7 @@ resource "azurerm_linux_virtual_machine" "mtc-vm" {
     azurerm_network_interface.mtc-nic.id,
   ]
 
-custom_data = filebase64("customdata.tpl")
+  custom_data = filebase64("customdata.tpl")
 
   admin_ssh_key {
     username   = "adminuser"
@@ -124,8 +124,21 @@ custom_data = filebase64("customdata.tpl")
     version   = "latest"
   }
 
+  provisioner "local-exec" {
+    command = templatefile("${var.host_os}-ssh-script.tftpl", {
+      hostname     = self.name,
+      user         = self.admin_username,
+      identityfile = "~/.ssh/tf-azure-key"
+    })
+    interpreter = var.host_os == "linux" ? ["bash", "-c"] : ["Powershel", "-Command"]
+  }
   tags = {
     environment = "dev"
   }
+}
+
+data "azurerm_public_ip" "mtc_ip_data" {
+  name = azurerm_public_ip.mtc-azurerm_public_ip.name
+  resource_group_name = azurerm_resource_group.mtc-rg.name
 }
 
